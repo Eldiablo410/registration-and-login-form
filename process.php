@@ -1,42 +1,32 @@
 <?php
 
-//Connect to database
-$serverName = "localhost";
-$userName = "michealegan93";
-$passWord = "letmein23";
-$dbName = "registration23";
+//Get the form data from the POST request
+$userName = $_POST['username'];
+$eMail = $_POST['email'];
+$password = hash('sha256',$_POST['password']);
 
-$hashedPass = hash('sha256',$passWord);
+//Open SQLite database file
+$db = new SQLite3('registration.sqlite');
 
-$con = new mysqli($serverName, $userName, $hashedPass, $dbName);
+//create users table if it doesn't exist already
+$db->exec('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT
+name TEXT, email TEXT, password TEXT)');
 
-if($con -> connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
+//insert users into database
+$stmt = $db->prepare('INSERT INTO users(name, email, password) VALUES (:name, :email, :password)');
+$stmt->bindValue(':name', $userName);
+$stmt->bindValue(':email', $eMail);
+$stmt->bindValue(':password', $password);
+$stmt->execute();
 
-//Get the form data
-$username = $_POST["userName"];
-$email = $_POST["email"];
-$password = $_POST["password"];
+//send an email confirmation to user
+$to = $email;
+$subject = 'Registration Confirmation';
+$message = "Thank you for registering, $name!";
+$headers = 'From: mywebsite@example.com';
+mail($to, $subject, $message, $headers);
 
-//Insert data into Database
-$sql = "INSERT INTO Registration(userName, eMail, passWord) VALUES ('$username', '$email', '$password')";
-
-if($con->query($sql) === TRUE) {
-  //successful query
-  //Send confirmation email to the user
-  $to = $email
-  $subject = "Registration Confirmation"
-  $message = "Thank you for registering!";
-  $headers = "From: yourname@randomwebsite.com";
-
-  mail($to, $subject, $message, $headers);
-
-  //redirect to confirmation page
-  header("Location: confirmation.php");
-} else {
-  echo "Error: " . $sql . "<br>" . $conn->error;
-}
-
-$con->close();
+//Redirect to confirmation page
+header('Location: confirmation.php');
+exit();
 ?>
