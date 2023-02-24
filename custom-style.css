@@ -1,0 +1,38 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 50px;
+  background-color: #FADBD8;
+  border: 5px solid #CB4335;
+  border-radius: 10px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 48px;
+  font-weight: bold;
+  color: #cb4335;
+  margin-bottom: 30px;
+}
+
+p {
+  font-size: 24px;
+  color: #7d3c98;
+  margin: bottom: 30px;
+}
+
+.btn {
+  display: inline-block;
+  background-color: #cb4335;
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 15px 30px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #a93226;
+}
