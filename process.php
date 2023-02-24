@@ -1,10 +1,10 @@
 <?php
 
 //Connect to database
-$serverName = "sql9.freemysqlhosting.net";
-$userName = "sql9600663";
-$passWord = "mysql_pass_23!";
-$dbName = "sql9600663";
+$serverName = "localhost";
+$userName = "michealegan93";
+$passWord = "letmein23";
+$dbName = "registration23";
 
 $hashedPass = hash('sha256',$passWord);
 
