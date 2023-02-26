@@ -4,10 +4,10 @@
 $host = 'localhost';
 $username = 'your_username';
 $password = 'your_password';
-$dbname = 'your_database';
+$db = 'your_database';
 
 //Create Database Connection
-$conn = mysqli_connect($host, $username, $password, $dbname);
+$conn = mysqli_connect($host, $username, $password, $db);
 
 //Check for errors on connection
 if (!$conn) {

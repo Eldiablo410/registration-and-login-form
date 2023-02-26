@@ -1,47 +1,38 @@
 <?php
-require_once 'connection.php';
+require_once('connection.php');
 
 // Define variables and set to empty values
 $username = $email = $password = '';
+$message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = test_input($_POST['username']);
-    $email = test_input($_POST['email']);
-    $password = hash('sha256', test_input($_POST['password']));
+    $username = $_POST['username'];
+    $email = $_POST['email'];
+    $password = hash('sha256', $_POST['password']);
 
     // Check if username or email already exist in database
-    $query = "SELECT * FROM users WHERE username = '$username' OR email = '$email' LIMIT 1";
-    $result = mysqli_query($connection, $query);
-    $user = mysqli_fetch_assoc($result);
-
-    if ($user) {
-        if ($user['username'] === $username) {
-            $message = 'Username already exists';
-        } else {
-            $message = 'Email already exists';
-        }
+    $sql = "INSERT INTO Users(userName, eMail, passWord)
+    VALUES('$username', '$email', '$password')";
+    if(mysqli_query($conn, $sql)) {
+        $message = "New Record Created Successfully";
     } else {
-        // Insert new user into database
-        $query = "INSERT INTO users (username, email, password) VALUES('$username', '$email', '$password')";
-        mysqli_query($connection, $query);
-
-        // Send email confirmation
-        $to = $email;
-        $subject = 'Registration Confirmation';
-        $message = 'Thank you for registering!';
-        $headers = 'From: webmaster@example.com' . "\r\n" .
-            'Reply-To: webmaster@example.com' . "\r\n" .
-            'X-Mailer: PHP/' . phpversion();
-        mail($to, $subject, $message, $headers);
-
-        // Redirect to confirmation page
-        header('Location: confirmation.php');
+        $message = "Error: " . $sql . "<br>" . mysqli_error($conn);
     }
 }
-
-function test_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
+mysqli_close($conn);
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Result</title>
+    <link rel="stylesheet" type="text/css" href="registrationresult.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Registration Result</h1>
+        <p><?php echo $message ?></p>
+        <a href="index.html"><button>Back to Home</button></a>
+        <a href="login.php"><button>Login</button></a>
+    </div>
+</body>
+</html>
