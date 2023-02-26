@@ -9,6 +9,8 @@
 <body>
   <div class="container">
     <h1>Register Now!</h1>
+    <p>If you're already registred, please go to the
+    <a href="login.php">Login Page</a>.</p>
     <form action="process.php" method="post">
       <label for="username">Username:</label>
       <input type="text" id="userName" name="username" required>
