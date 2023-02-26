@@ -27,5 +27,4 @@ mysqli_close($conn);
 // Redirect the user to the confirmation page
 header('Location: confirmation.php');
 exit();
-
 ?>
