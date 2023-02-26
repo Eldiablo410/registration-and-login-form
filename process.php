@@ -1,30 +1,47 @@
 <?php
+require_once 'connection.php';
 
-// Include the database connection file
-require_once('connection.php');
+// Define variables and set to empty values
+$username = $email = $password = '';
 
-// Get the form data from the POST request
-$name = $_POST['name'];
-$email = $_POST['email'];
-$password = hash('sha256', $_POST['password']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = test_input($_POST['username']);
+    $email = test_input($_POST['email']);
+    $password = hash('sha256', test_input($_POST['password']));
 
-// Insert the new user into the database
-$stmt = mysqli_prepare($conn, 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)');
-mysqli_stmt_bind_param($stmt, 'sss', $name, $email, $password);
-mysqli_stmt_execute($stmt);
+    // Check if username or email already exist in database
+    $query = "SELECT * FROM users WHERE username = '$username' OR email = '$email' LIMIT 1";
+    $result = mysqli_query($connection, $query);
+    $user = mysqli_fetch_assoc($result);
 
-// Send an email confirmation to the user
-$to = $email;
-$subject = 'Registration Confirmation';
-$message = "Thank you for registering, $name!";
-$headers = 'From: mywebsite@example.com';
-mail($to, $subject, $message, $headers);
+    if ($user) {
+        if ($user['username'] === $username) {
+            $message = 'Username already exists';
+        } else {
+            $message = 'Email already exists';
+        }
+    } else {
+        // Insert new user into database
+        $query = "INSERT INTO users (username, email, password) VALUES('$username', '$email', '$password')";
+        mysqli_query($connection, $query);
 
-// Close the database connection
-mysqli_stmt_close($stmt);
-mysqli_close($conn);
+        // Send email confirmation
+        $to = $email;
+        $subject = 'Registration Confirmation';
+        $message = 'Thank you for registering!';
+        $headers = 'From: webmaster@example.com' . "\r\n" .
+            'Reply-To: webmaster@example.com' . "\r\n" .
+            'X-Mailer: PHP/' . phpversion();
+        mail($to, $subject, $message, $headers);
 
-// Redirect the user to the confirmation page
-header('Location: confirmation.php');
-exit();
-?>
+        // Redirect to confirmation page
+        header('Location: confirmation.php');
+    }
+}
+
+function test_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
