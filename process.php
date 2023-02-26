@@ -1,32 +1,31 @@
 <?php
 
-//Get the form data from the POST request
-$userName = $_POST['username'];
-$eMail = $_POST['email'];
-$password = hash('sha256',$_POST['password']);
+// Include the database connection file
+require_once('connection.php');
 
-//Open SQLite database file
-$db = new SQLite3('registration.sqlite');
+// Get the form data from the POST request
+$name = $_POST['name'];
+$email = $_POST['email'];
+$password = hash('sha256', $_POST['password']);
 
-//create users table if it doesn't exist already
-$db->exec('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT
-name TEXT, email TEXT, password TEXT)');
+// Insert the new user into the database
+$stmt = mysqli_prepare($conn, 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)');
+mysqli_stmt_bind_param($stmt, 'sss', $name, $email, $password);
+mysqli_stmt_execute($stmt);
 
-//insert users into database
-$stmt = $db->prepare('INSERT INTO users(name, email, password) VALUES (:name, :email, :password)');
-$stmt->bindValue(':name', $userName);
-$stmt->bindValue(':email', $eMail);
-$stmt->bindValue(':password', $password);
-$stmt->execute();
-
-//send an email confirmation to user
+// Send an email confirmation to the user
 $to = $email;
 $subject = 'Registration Confirmation';
 $message = "Thank you for registering, $name!";
 $headers = 'From: mywebsite@example.com';
 mail($to, $subject, $message, $headers);
 
-//Redirect to confirmation page
+// Close the database connection
+mysqli_stmt_close($stmt);
+mysqli_close($conn);
+
+// Redirect the user to the confirmation page
 header('Location: confirmation.php');
 exit();
+
 ?>
